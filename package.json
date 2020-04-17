@@ -1,0 +1,39 @@
+{
+  "name": "stream-csv",
+  "version": "1.0.0",
+  "description": "Stream users as csv format",
+  "main": "index.js",
+  "scripts": {
+    "start": "env-cmd -f ./configs/env.dev.js nodemon index.js",
+    "mock:db:users": "env-cmd -f ./configs/env.dev.js node scripts/mockUsers.js",
+    "test": "env-cmd -f ./configs/env.dev.js npx jest"
+  },
+  "keywords": [
+    "Stream",
+    "Users",
+    "CSV"
+  ],
+  "author": "Saeid Alidadi",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^25.3.0",
+    "nodemon": "^2.0.3",
+    "supertest": "^4.0.2"
+  },
+  "dependencies": {
+    "JSONStream": "^1.3.5",
+    "cli-progress": "^3.7.0",
+    "env-cmd": "^10.1.0",
+    "express": "^4.17.1",
+    "faker": "^4.1.0",
+    "json2csv": "^5.0.0",
+    "mongodb": "^3.5.6",
+    "mongoose": "^5.9.9"
+  },
+  "nodemonConfig": {
+    "watch": [
+      "src",
+      "configs"
+    ]
+  }
+}
