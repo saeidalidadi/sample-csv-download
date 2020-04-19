@@ -4,16 +4,13 @@ const JSONStream = require("JSONStream");
 const UserModel = require("./model").User;
 const Express = require("express");
 const app = Express();
-const {
-  Parser,
-  Transform,
-  transforms: { unwind }
-} = require("json2csv");
+const { parser: csvParser } = require("./csv-parser");
 
-
+// Todo: use a template engine 
 app.get("/", (req, res) => {
   res.send(`
     <html>
+      <head><title>Users Link</title></head>
       <body>
         Download all users as csv file from\
         <a style="font-size: 20" href='/users'>here</a>
@@ -24,21 +21,18 @@ app.get("/", (req, res) => {
 
 app.get("/users", async (req, res) => {
 
-  const cursor = await UserModel.find({}).cursor();
-
-  const fields = ['name', 'birthdate', "email", 'products.name', 'products.categories'];
-  const transforms = [unwind(['products'])];
-  const csvParser = new Transform({ fields, transforms });
+  const cursor = await UserModel.find().cursor();
 
   res.setHeader('Content-Disposition', `attachment; filename=\"users-${Date.now()}.csv\"`);
+  res.set('Content-Type', 'text/csv');
   cursor
     .pipe(JSONStream.stringify())
     .pipe(csvParser)
-    .pipe(res.type("text/csv"))
+    .pipe(res)
 })
 
 
-const start = async () => {
+const start = async (done) => {
   try {
     const db = await dbClient.connect();
     console.log("connection created to mongodb.")
@@ -47,6 +41,9 @@ const start = async () => {
     const server = app.listen(PORT, HOST, (err) => {
       const { address, port } = server.address();
       console.log("Lisening on: %s:%s", address, port)
+
+      // callback for external use
+      done && done({ server, db })
     });
 
     return { server, db };
@@ -58,8 +55,3 @@ const start = async () => {
 
 exports.start = start;
 exports.app = app;
-
-process.on("uncaughtException", (err) => {
-  console.log(err);
-  process.exit(1);
-})

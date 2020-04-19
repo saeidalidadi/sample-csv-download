@@ -1,4 +1,5 @@
 const Mongoose = require("mongoose");
+Mongoose.Promise = Promise;
 
 const createConnection = async () => {
 

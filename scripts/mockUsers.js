@@ -19,8 +19,6 @@ const start = async (progress) => {
 
     progress.start(totalDocumentsCount, 0);
 
-    let counter = 0;
-
     const data = {
       workerData:
       {
@@ -31,7 +29,6 @@ const start = async (progress) => {
     for (let i = 0; i < workersCount; i++) {
       const mockWorker = new Worker(__filename, data);
       mockWorker.on("message", (count) => {
-        counter = counter + count;
         progress.increment();
       })
     }
@@ -47,24 +44,19 @@ const start = async (progress) => {
       }
     }
 
-    const start = async () => {
+    // Count users have been inserted to db
+    let counter = 0;
 
-      // Count users have been inserted to db
-      let counter = 0;
+    // users document count
+    let max = workerData.documetsCount;
 
-      // users document count
-      let max = workerData.documetsCount;
+    while (counter < max) {
+      await createUsers();
+      counter++;
+      parentPort.postMessage(1);
+    };
 
-      while (counter < max) {
-        await createUsers();
-        counter++;
-        parentPort.postMessage(1);
-      };
-
-      db.close()
-    }
-
-    start();
+    db.close()
   }
 }
 

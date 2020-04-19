@@ -8,7 +8,13 @@ const { start } = require("./src/app");
 
 (
 
-  async () => await start()
+  async () => {
+    await start();
 
+    process.on("uncaughtException", (err) => {
+      console.log(err);
+      process.exit(1);
+    })
+  }
 )();
 
